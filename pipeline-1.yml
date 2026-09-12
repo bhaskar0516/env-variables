@@ -1,0 +1,30 @@
+name: without secrets pipeline
+on: push
+env:
+  dockerusername: bhaskar0516
+  image_name: nginx3
+jobs:
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: artifacts
+        uses: actions/checkout@v4
+
+      - name: Docker build
+        run: docker build -t $dockerusername/image_name:latest .
+
+      - name: Docker credentails
+        env:
+          docker_password: Docker@516  
+        run: docker login --username=dockerusername --password=Docker@516
+
+      - name: Docker login
+        run: docker push dockerusername/image_name:latest
+
+  deploy-job:
+    needs: build-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker deploy
+        run: docker run -d -p 8080:80 dockerusername/image_name:latest
+      
